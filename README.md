@@ -23,4 +23,4 @@ b. _Admin:_ Authorized to flip _User_ privileges
     hasAccess: { type: Boolean, default: true }
 }
 
-◦ **Live deployment links:** https://access-revocation-mgmtsys.onrender.com/ (Render)
+◦ **Live deployment links:** https://access-revocation-mgmtsys.onrender.com/
