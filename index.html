@@ -4,7 +4,7 @@
     <h2>E0322038 - Access Revocation Management System</h2>
     
     <input id="u" placeholder="user"> 
-    <password id="p" placeholder="pass"> 
+    <input id="p" type="password" placeholder="pass"> 
     <button onclick="go('/auth/register')">Register</button>
     <button onclick="go('/auth/login')">Log In</button>
     
@@ -12,19 +12,34 @@
 
     <script>
         let t = '';
-        const API = ''
+        const API = ''; // Leave blank if serving from same domain
 
         async function go(path) {
-            const r = await fetch(API + path, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username: u.value, password: p.value, role: 'USER'}) 
-            });
-            const d = await r.json();
-            if(d.token) {
-                t = d.token;
-                document.getElementById('out').innerHTML = `Logged in as: ${d.role} <br> <button onclick="check()">Check Status</button> <button onclick="list()">Admin List</button>`;
-            } else { alert('ok'); }
+            try {
+                const r = await fetch(API + path, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: u.value, password: p.value, role: 'USER'}) 
+                });
+                
+                // If it's a 401 or 403, it might not be JSON
+                if (!r.ok) {
+                    const txt = await r.text();
+                    alert('Server says: ' + txt);
+                    return;
+                }
+
+                const d = await r.json();
+                if(d.token) {
+                    t = d.token;
+                    document.getElementById('out').innerHTML = `Logged in as: ${d.role} <br> <button onclick="check()">Check Status</button> <button onclick="list()">Admin List</button>`;
+                } else { 
+                    alert('Done/Success'); 
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error: Check Console');
+            }
         }
 
         async function check() {
@@ -35,9 +50,13 @@
 
         async function list() {
             const r = await fetch(API + '/admin/users', {headers: {'Authorization': 'Bearer ' + t}});
+            if (r.status === 403) {
+                alert("Access Denied: Admin Only");
+                return;
+            }
             const d = await r.json();
-            document.getElementById('out').innerHTML = d.map(u => `
-                <div>${u.username} | ${u.hasAccess} <button onclick="flip('${u._id}')">Flip</button></div>
+            document.getElementById('out').innerHTML = d.map(user => `
+                <div>${user.username} | Access: ${user.hasAccess} <button onclick="flip('${user._id}')">Flip</button></div>
             `).join('');
         }
 
@@ -51,6 +70,4 @@
         }
     </script>
 </body>
-
 </html>
-
