@@ -12,7 +12,7 @@
 
     <script>
         let t = '';
-        const API = ''; // Leave blank if serving from same domain
+        const API = '';
 
         async function go(path) {
             try {
@@ -22,7 +22,6 @@
                     body: JSON.stringify({username: u.value, password: p.value, role: 'USER'}) 
                 });
                 
-                // If it's a 401 or 403, it might not be JSON
                 if (!r.ok) {
                     const txt = await r.text();
                     alert('Server says: ' + txt);
