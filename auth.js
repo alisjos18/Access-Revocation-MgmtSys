@@ -15,10 +15,11 @@ router.post('/login', async (req, res) => {
     if (!user || req.body.password !== user.password) {
         return res.status(401).send("fail");
     }
-    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET);
+    //const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET);
     res.send({ token, role: user.role });
 });
 
 
 module.exports = router;
+
 
