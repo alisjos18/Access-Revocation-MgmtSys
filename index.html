@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>E0322038 - Access Revocation Management System</h2>
+    
+    <input id="u" placeholder="user"> 
+    <input id="p" placeholder="pass"> 
+    <button onclick="go('/auth/register')">Register</button>
+    <button onclick="go('/auth/login')">Login</button>
+    
+    <div id="out" style="margin-top:20px; font-family:monospace"></div>
+
+    <script>
+        let t = '';
+        const API = ''
+
+        async function go(path) {
+            const r = await fetch(API + path, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: u.value, password: p.value, role: 'USER'}) 
+            });
+            const d = await r.json();
+            if(d.token) {
+                t = d.token;
+                document.getElementById('out').innerHTML = `Logged in as: ${d.role} <br> <button onclick="check()">Check Status</button> <button onclick="list()">Admin List</button>`;
+            } else { alert('ok'); }
+        }
+
+        async function check() {
+            const r = await fetch(API + '/status', {headers: {'Authorization': 'Bearer ' + t}});
+            const d = await r.json();
+            document.getElementById('out').innerHTML += `<br>Access: ${d.hasAccess}`;
+        }
+
+        async function list() {
+            const r = await fetch(API + '/admin/users', {headers: {'Authorization': 'Bearer ' + t}});
+            const d = await r.json();
+            document.getElementById('out').innerHTML = d.map(u => `
+                <div>${u.username} | ${u.hasAccess} <button onclick="flip('${u._id}')">Flip</button></div>
+            `).join('');
+        }
+
+        async function flip(id) {
+            await fetch(API + '/admin/toggle', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t},
+                body: JSON.stringify({userId: id})
+            });
+            list();
+        }
+    </script>
+</body>
+</html>
