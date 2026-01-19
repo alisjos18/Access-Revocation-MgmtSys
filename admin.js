@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('./user');
-const auth = require('./authMiddleware');
+const auth = require('./authmiddle');
 
 router.get('/users', auth, async (req, res) => {
     if (req.user.role !== 'ADMIN') return res.status(403).send("No.");
@@ -16,5 +16,6 @@ router.post('/toggle', auth, async (req, res) => {
     await user.save();
     res.send({ newStatus: user.hasAccess });
 });
+
 
 module.exports = router;
