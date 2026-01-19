@@ -7,6 +7,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const PORT = 5000;
+const MONGO_URI = 'mongodb+srv://user:password_mongodbatlas@e0322038-cluster.cavnss1.mongodb.net/?appName=e0322038-cluster';
+const JWT_SECRET = 'secret';
+
 mongoose.connect(process.env.MONGO_URI);
 
 app.use('/auth', require('./auth')); 
@@ -24,3 +28,4 @@ app.get('/', (req, res) => {
 
 
 app.listen(process.env.PORT || 5000);
+
